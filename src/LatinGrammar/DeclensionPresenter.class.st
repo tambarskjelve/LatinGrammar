@@ -18,3 +18,10 @@ DeclensionPresenter >> defaultLayout [
 { #category : #initialization }
 DeclensionPresenter >> initializePresenters [ 
 ]
+
+{ #category : #initialization }
+DeclensionPresenter >> initializeWindow: aWindowPresenter [
+	aWindowPresenter 
+		title: 'Latin Declensions';
+		initialExtent: 400@300.
+]

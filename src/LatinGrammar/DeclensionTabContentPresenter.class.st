@@ -2,46 +2,53 @@ Class {
 	#name : #DeclensionTabContentPresenter,
 	#superclass : #SpPresenter,
 	#instVars : [
-		'grammarWords',
+		'caseSymbols',
 		'singular',
-		'plural'
+		'plural',
+		'caseNames'
 	],
 	#category : #LatinGrammar
 }
 
 { #category : #layout }
 DeclensionTabContentPresenter >> defaultLayout [  
-	^ SpBoxLayout newLeftToRight 
-		add: (SpBoxLayout newTopToBottom 
-			add: 'Nominative';
-			add: 'Genitive';
-			add: 'Dative';
-			add: 'Accusative';
-			add: 'Ablative';
-			yourself);
-		add: (SpBoxLayout newTopToBottom 
-			add: (singular at: #nom);
-			add: (singular at: #gen);
-			add: (singular at: #dat);
-			add: (singular at: #acc);
-			add: (singular at: #abl);
-			yourself);
-		add: (SpBoxLayout newTopToBottom 
-			add: (plural at: #nom);
-			add: (plural at: #gen);
-			add: (plural at: #dat);
-			add: (plural at: #acc);
-			add: (plural at: #abl);
-			yourself).
+
+	| complete caseColumn singularInputColumn pluralInputColumn |
+	complete := SpBoxLayout newLeftToRight.
+	
+	caseColumn := SpBoxLayout newTopToBottom
+		borderWidth: 10;
+		spacing: 10;
+		add: ''.
+	caseNames do: [ :case | caseColumn add: case ].
+	
+	singularInputColumn := SpBoxLayout newTopToBottom
+		borderWidth: 10;
+		spacing: 10;
+		add: 'Singular'.
+	caseSymbols do: [ :symbol | singularInputColumn add: (singular at: symbol) ].
+	
+	pluralInputColumn := SpBoxLayout newTopToBottom
+		borderWidth: 10;
+		spacing: 10;
+		add: 'Plural'.
+	caseSymbols do: [ :symbol | pluralInputColumn add: (plural at: symbol) ].
+			
+	^ complete
+		add: caseColumn;
+		add: singularInputColumn;
+		add: pluralInputColumn;
+		yourself.
 ]
 
 { #category : #initialization }
 DeclensionTabContentPresenter >> initializePresenters [ 
 	
-	grammarWords := #( #nom #gen #dat #acc #abl ).
+	caseNames := #('Nominative' 'Genitive' 'Dative' 'Accusative' 'Ablative').
+	caseSymbols := #( #nom #gen #dat #acc #abl ).
 	singular := Dictionary new.
 	plural := Dictionary new.
-	grammarWords do: [ :key | 
+	caseSymbols do: [ :key | 
 		singular add: key->(self newTextInput). 
 		plural add: key->(self newTextInput)].
 	
