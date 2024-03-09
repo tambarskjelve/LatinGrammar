@@ -3,9 +3,9 @@ Class {
 	#superclass : #SpPresenter,
 	#instVars : [
 		'caseSymbols',
-		'singular',
-		'plural',
-		'caseNames'
+		'caseNames',
+		'pluralTextInputs',
+		'singularTextInputs'
 	],
 	#category : #LatinGrammar
 }
@@ -26,13 +26,13 @@ DeclensionTabContentPresenter >> defaultLayout [
 		borderWidth: 10;
 		spacing: 10;
 		add: 'Singular'.
-	caseSymbols do: [ :symbol | singularInputColumn add: (singular at: symbol) ].
+	caseSymbols do: [ :symbol | singularInputColumn add: (singularTextInputs at: symbol) ].
 	
 	pluralInputColumn := SpBoxLayout newTopToBottom
 		borderWidth: 10;
 		spacing: 10;
 		add: 'Plural'.
-	caseSymbols do: [ :symbol | pluralInputColumn add: (plural at: symbol) ].
+	caseSymbols do: [ :symbol | pluralInputColumn add: (pluralTextInputs at: symbol) ].
 			
 	^ complete
 		add: caseColumn;
@@ -42,25 +42,34 @@ DeclensionTabContentPresenter >> defaultLayout [
 ]
 
 { #category : #initialization }
+DeclensionTabContentPresenter >> initialize [
+
+	super initialize.
+	
+	singularTextInputs := Dictionary new.
+	pluralTextInputs := Dictionary new.
+]
+
+{ #category : #initialization }
 DeclensionTabContentPresenter >> initializePresenters [ 
 	
 	caseNames := #('Nominative' 'Genitive' 'Dative' 'Accusative' 'Ablative').
 	caseSymbols := #( #nom #gen #dat #acc #abl ).
-	singular := Dictionary new.
-	plural := Dictionary new.
+	singularTextInputs := Dictionary new.
+	pluralTextInputs := Dictionary new.
 	caseSymbols do: [ :key | 
-		singular add: key->(self newTextInput). 
-		plural add: key->(self newTextInput)].
+		singularTextInputs add: key->(self newTextInput). 
+		pluralTextInputs add: key->(self newTextInput)].
 	
 	
 ]
 
 { #category : #initialization }
 DeclensionTabContentPresenter >> plural [
-	^ plural
+	^ pluralTextInputs
 ]
 
 { #category : #initialization }
 DeclensionTabContentPresenter >> singular [
-	^ singular
+	^ singularTextInputs
 ]
