@@ -5,10 +5,17 @@ Class {
 		'caseSymbols',
 		'caseNames',
 		'pluralTextInputs',
-		'singularTextInputs'
+		'singularTextInputs',
+		'fasit',
+		'grammarCase'
 	],
 	#category : #LatinGrammar
 }
+
+{ #category : #'as yet unclassified' }
+DeclensionTabContentPresenter class >> forCase: aDictionary [
+	^ self new initializeWithCase: aDictionary; yourself.
+]
 
 { #category : #layout }
 DeclensionTabContentPresenter >> defaultLayout [  
@@ -41,13 +48,9 @@ DeclensionTabContentPresenter >> defaultLayout [
 		yourself.
 ]
 
-{ #category : #initialization }
-DeclensionTabContentPresenter >> initialize [
-
-	super initialize.
-	
-	singularTextInputs := Dictionary new.
-	pluralTextInputs := Dictionary new.
+{ #category : #accessing }
+DeclensionTabContentPresenter >> grammarCase [
+	^ grammarCase 
 ]
 
 { #category : #initialization }
@@ -55,13 +58,19 @@ DeclensionTabContentPresenter >> initializePresenters [
 	
 	caseNames := #('Nominative' 'Genitive' 'Dative' 'Accusative' 'Ablative').
 	caseSymbols := #( #nom #gen #dat #acc #abl ).
+	fasit := #('aqua' 'aquae' 'aquae' 'aquam' 'aquā').
+	
 	singularTextInputs := Dictionary new.
 	pluralTextInputs := Dictionary new.
+	
 	caseSymbols do: [ :key | 
-		singularTextInputs add: key->(self newTextInput). 
+		singularTextInputs add: key->(self newTextInput whenSubmitDo: [ :sdf | Transcript show: 'hello!' ]; yourself). 
 		pluralTextInputs add: key->(self newTextInput)].
-	
-	
+]
+
+{ #category : #initialization }
+DeclensionTabContentPresenter >> initializeWithCase: aDictionary [
+	grammarCase := aDictionary.
 ]
 
 { #category : #initialization }
