@@ -19,9 +19,8 @@ DeclensionTabContentPresenter class >> forCase: aDictionary [
 
 { #category : #layout }
 DeclensionTabContentPresenter >> defaultLayout [  
-
-	| complete caseColumn singularInputColumn pluralInputColumn |
-	complete := SpBoxLayout newLeftToRight.
+	"Default layout needs to select the first gender for its particular case. "
+	| grammarSection caseColumn singularInputColumn pluralInputColumn |
 	
 	caseColumn := SpBoxLayout newTopToBottom
 		borderWidth: 10;
@@ -41,11 +40,22 @@ DeclensionTabContentPresenter >> defaultLayout [
 		add: 'Plural'.
 	caseSymbols do: [ :symbol | pluralInputColumn add: (pluralTextInputs at: symbol) ].
 			
-	^ complete
+	grammarSection := SpBoxLayout newLeftToRight
 		add: caseColumn;
 		add: singularInputColumn;
-		add: pluralInputColumn;
+		add: pluralInputColumn.
+		
+	^ SpBoxLayout newTopToBottom
+		add: grammarSection;
+		add: (SpBoxLayout newLeftToRight
+					add: (SpBoxLayout newLeftToRight
+							add: (self newButton label: 'feminine'; yourself) ;
+							add: (self newButton label: 'masculine'; yourself));
+					add: (SpBoxLayout newLeftToRight
+							add: (self newButton label: ''; yourself) ;
+							add: (self newButton label: 'next'; yourself)));
 		yourself.
+	
 ]
 
 { #category : #accessing }
@@ -64,13 +74,20 @@ DeclensionTabContentPresenter >> initializePresenters [
 	pluralTextInputs := Dictionary new.
 	
 	caseSymbols do: [ :key | 
-		singularTextInputs add: key->(self newTextInput whenSubmitDo: [ :sdf | Transcript show: 'hello!' ]; yourself). 
+		singularTextInputs add: key->(self newTextInput). 
 		pluralTextInputs add: key->(self newTextInput)].
+	
+" whenSubmitDo: [ :text | text = (grammarCase ) if Transcript show: 'hello!' ]"
 ]
 
 { #category : #initialization }
 DeclensionTabContentPresenter >> initializeWithCase: aDictionary [
 	grammarCase := aDictionary.
+]
+
+{ #category : #'scripting - widgets' }
+DeclensionTabContentPresenter >> newButton [
+	^ self instantiate: SpButtonPresenter
 ]
 
 { #category : #initialization }
