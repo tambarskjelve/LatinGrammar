@@ -16,7 +16,8 @@ Class {
 		'columnForSingularCaseFeedback',
 		'columnForPluralCaseFeedback',
 		'singularFeedback',
-		'pluralFeedback'
+		'pluralFeedback',
+		'genderButtons'
 	],
 	#category : #LatinGrammar
 }
@@ -64,12 +65,13 @@ DeclensionTabContentPresenter >> defaultLayout [
 		add: columnForPluralCaseFeedback;
 		yourself.
 		
+	"Define layout for button Section"
+	
+	"Return complete layout"
 	^ SpBoxLayout newTopToBottom
 		add: grammarSection;
 		add: (SpBoxLayout newLeftToRight
-					add: (SpBoxLayout newLeftToRight
-							add: (self newButton label: 'feminine'; yourself) ;
-							add: (self newButton label: 'masculine'; yourself));
+					add: genderButtons;
 					add: (SpBoxLayout newLeftToRight
 							add: (self newButton label: ''; yourself) ;
 							add: (self newButton label: 'next'; yourself)));
@@ -134,9 +136,10 @@ DeclensionTabContentPresenter >> initializePresenters [
 		(pluralTextInputs at: key) whenSubmitDo: [ :text | | correctWord |
 			correctWord := ((((grammarCase at: defaultCase) at: 'wordlist') at: 1) at: 'rootword'), (((grammarCase at: defaultCase) at: 'plural') at: key).
 			text = correctWord ifTrue: [(pluralFeedback at: key) image: (self iconNamed: #thumbsUp) ] ifFalse: [(pluralFeedback at: key) image: (self iconNamed: #thumbsDown) ] ]
-	]
-"((((grammarCase at: 'female') at: 'wordlist') at: 1) at: 'rootword'), (((grammarCase at: 'female') at: 'singular') at: 'gen')"
-" whenSubmitDo: [ :text | text = (grammarCase ) if Transcript show: 'hello!' ]"
+	].
+
+	genderButtons := SpBoxLayout newLeftToRight.
+	(grammarCase at: 'genders') do: [ :gender | genderButtons add: (self newButton label: gender; yourself) ].
 ]
 
 { #category : #'scripting - widgets' }
