@@ -32,6 +32,11 @@ DeclensionTabContentPresenter class >> forCase: aDictionary [
 
 ]
 
+{ #category : #accessing }
+DeclensionTabContentPresenter >> currentWord: aString [
+	currentWord := aString.
+]
+
 { #category : #layout }
 DeclensionTabContentPresenter >> defaultLayout [  
 	"Default layout needs to select the first gender for its particular case. "
@@ -40,7 +45,7 @@ DeclensionTabContentPresenter >> defaultLayout [
 	caseColumn := SpBoxLayout newTopToBottom
 		borderWidth: 10;
 		spacing: 10;
-		add: (currentWord capitalized).
+		add: currentWord.
 	caseNames do: [ :case | caseColumn add: case ].
 	
 	columnForSingularCaseInput := SpBoxLayout newTopToBottom
@@ -87,13 +92,12 @@ DeclensionTabContentPresenter >> grammarCase [
 { #category : #accessing }
 DeclensionTabContentPresenter >> grammarCase: aDictionary [
 	grammarCase := aDictionary.
-	currentWord := (((aDictionary at: ((aDictionary at: 'genders') at: 1)) at: 'wordlist') at: 1) at: 'word'.
+	currentWord := SpLabelPresenter new label: (((((aDictionary at: ((aDictionary at: 'genders') at: 1)) at: 'wordlist') at: 1) at: 'word') capitalized); yourself.
+	currentWord displayBold: [true].
 ]
 
 { #category : #initialization }
 DeclensionTabContentPresenter >> initializePresenters [ 
-
-	| defaultCase |
 
 	caseNames := #('Nominative' 'Genitive' 'Dative' 'Accusative' 'Ablative').
 	caseKeys := #( 'nom' 'gen' 'dat' 'acc' 'abl' ).
@@ -105,8 +109,8 @@ DeclensionTabContentPresenter >> initializePresenters [
 	pluralFeedback := Dictionary new.
 	
 " 	inputCorrect := SpBoxLayout newTopToBottom add: (self iconNamed: 'thumbsUp'); yourself."
-	inputCorrect := SpImagePresenter new image: nil.
- 	inputIncorrect := SpBoxLayout newTopToBottom add: (self iconNamed: 'thumbsDown'); yourself.
+	inputCorrect := self iconNamed: 'thumbsUp'.
+ 	inputIncorrect := self iconNamed: 'thumbsDown'.
 		
 	caseKeys do: [ :key | 
 		singularTextInputs add: key->(self newTextInput). 
@@ -128,18 +132,16 @@ DeclensionTabContentPresenter >> initializePresenters [
 
 	"Make sure each text input test for correct gender"
 	"caseSymbols do: [ :symbol | pluralInputColumn add: (pluralTextInputs at: symbol) ]."
-	defaultCase := (grammarCase at: 'genders') at: 1.
-	caseKeys do: [ :key | 
-		(singularTextInputs at: key) whenSubmitDo: [ :text | | correctWord |
-			correctWord := ((((grammarCase at: defaultCase) at: 'wordlist') at: 1) at: 'rootword'), (((grammarCase at: defaultCase) at: 'singular') at: key).
-			text = correctWord ifTrue: [(singularFeedback at: key) image: (self iconNamed: #thumbsUp) ] ifFalse: [(singularFeedback at: key) image: (self iconNamed: #thumbsDown) ] ].
-		(pluralTextInputs at: key) whenSubmitDo: [ :text | | correctWord |
-			correctWord := ((((grammarCase at: defaultCase) at: 'wordlist') at: 1) at: 'rootword'), (((grammarCase at: defaultCase) at: 'plural') at: key).
-			text = correctWord ifTrue: [(pluralFeedback at: key) image: (self iconNamed: #thumbsUp) ] ifFalse: [(pluralFeedback at: key) image: (self iconNamed: #thumbsDown) ] ]
-	].
+	self setInputsForCase: ((grammarCase at: 'genders') at: 1).
 
+	"Next up: a sophisticated way to redefine word to be tested. Here you need an instance function, no way around that. "
 	genderButtons := SpBoxLayout newLeftToRight.
-	(grammarCase at: 'genders') do: [ :gender | genderButtons add: (self newButton label: gender; yourself) ].
+	(grammarCase at: 'genders') do: [ :gender | | button |
+		button := self newButton label: gender.
+		button action: [ 
+			self setInputsForCase: button label. 
+			Transcript show: 'button pressed: ', (((((grammarCase at: (button label)) at: 'wordlist') at: 1) at: 'word') capitalized); cr. ].
+		genderButtons add: button. ].
 ]
 
 { #category : #'scripting - widgets' }
@@ -150,6 +152,32 @@ DeclensionTabContentPresenter >> newButton [
 { #category : #initialization }
 DeclensionTabContentPresenter >> plural [
 	^ pluralTextInputs
+]
+
+{ #category : #initialization }
+DeclensionTabContentPresenter >> setInputsForCase: aString [
+
+	Transcript show: 'setInputsForCase: called'; cr.
+	currentWord label: (((((grammarCase at: aString) at: 'wordlist') at: 1) at: 'word') capitalized).
+	
+	caseKeys do: [ :key | 
+		
+		(singularTextInputs at: key) whenSubmitDo: [ :text | | correctWord |
+			correctWord := ((((grammarCase at: aString) at: 'wordlist') at: 1) at: 'rootword'), (((grammarCase at: aString) at: 'singular') at: key).
+			Transcript show: correctWord; cr.
+			text = correctWord 
+				ifTrue: [(singularFeedback at: key) image: inputCorrect  ] 
+				ifFalse: [(singularFeedback at: key) image: inputIncorrect ] 
+		].
+			
+		(pluralTextInputs at: key) whenSubmitDo: [ :text | | correctWord |
+			correctWord := ((((grammarCase at: aString) at: 'wordlist') at: 1) at: 'rootword'), (((grammarCase at: aString) at: 'plural') at: key).
+			Transcript show: correctWord; cr.
+			text = correctWord 
+				ifTrue: [(pluralFeedback at: key) image: inputCorrect ] 
+				ifFalse: [(pluralFeedback at: key) image: inputIncorrect ]
+		]
+	]
 ]
 
 { #category : #initialization }
