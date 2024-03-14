@@ -104,10 +104,14 @@ DeclensionCurrentWordPresenter >> initializePresenters [
 { #category : #'as yet unclassified' }
 DeclensionCurrentWordPresenter >> textInputForCase: aString feedBackPresenter: aPicturePresenter [
 	
-	^ (self newTextInput) whenSubmitDo: [ :text | 
-			Transcript show: aString; cr.
-			text = aString 
-				ifTrue: [aPicturePresenter image: inputCorrect  ] 
-				ifFalse: [aPicturePresenter image: inputIncorrect ]
+	^ (self newTextInput) whenSubmitDo: [ :text |
+			(aString isEmpty) 
+				ifTrue: [text = word 
+					ifTrue: [aPicturePresenter image: inputCorrect  ] 
+					ifFalse: [aPicturePresenter image: inputIncorrect ]] 
+				ifFalse: [ text = aString 
+					ifTrue: [aPicturePresenter image: inputCorrect  ] 
+					ifFalse: [aPicturePresenter image: inputIncorrect ]]. 
+			Transcript show: aString; cr.	
 		]
 ]
