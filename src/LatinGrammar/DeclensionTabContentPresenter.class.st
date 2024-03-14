@@ -11,13 +11,20 @@ Class {
 		'grammarCase',
 		'caseKeys',
 		'currentWord',
+		'currentGender',
 		'inputCorrect',
 		'inputIncorrect',
 		'columnForSingularCaseFeedback',
 		'columnForPluralCaseFeedback',
 		'singularFeedback',
 		'pluralFeedback',
-		'genderButtons'
+		'genders',
+		'genderButtonsContainer',
+		'singularCases',
+		'singularSuffixes',
+		'pluralSuffixes',
+		'pluralCases',
+		'wordList'
 	],
 	#category : #LatinGrammar
 }
@@ -76,7 +83,7 @@ DeclensionTabContentPresenter >> defaultLayout [
 	^ SpBoxLayout newTopToBottom
 		add: grammarSection;
 		add: (SpBoxLayout newLeftToRight
-					add: genderButtons;
+					add: genderButtonsContainer;
 					add: (SpBoxLayout newLeftToRight
 							add: (self newButton label: ''; yourself) ;
 							add: (self newButton label: 'next'; yourself)));
@@ -92,12 +99,14 @@ DeclensionTabContentPresenter >> grammarCase [
 { #category : #accessing }
 DeclensionTabContentPresenter >> grammarCase: aDictionary [
 	grammarCase := aDictionary.
-	currentWord := SpLabelPresenter new label: (((((aDictionary at: ((aDictionary at: 'genders') at: 1)) at: 'wordlist') at: 1) at: 'word') capitalized); yourself.
-	currentWord displayBold: [true].
+	currentGender := (aDictionary at: 'genders') at: 1.
+	currentWord := (((aDictionary at: currentGender) at: 'wordlist') at: 1) capitalized; yourself.
 ]
 
 { #category : #initialization }
 DeclensionTabContentPresenter >> initializePresenters [ 
+
+	genders := (grammarCase at: 'genders').
 
 	caseNames := #('Nominative' 'Genitive' 'Dative' 'Accusative' 'Ablative').
 	caseKeys := #( 'nom' 'gen' 'dat' 'acc' 'abl' ).
@@ -135,13 +144,14 @@ DeclensionTabContentPresenter >> initializePresenters [
 	self setInputsForCase: ((grammarCase at: 'genders') at: 1).
 
 	"Next up: a sophisticated way to redefine word to be tested. Here you need an instance function, no way around that. "
-	genderButtons := SpBoxLayout newLeftToRight.
-	(grammarCase at: 'genders') do: [ :gender | | button |
+	" I want the buttons to replace the grammar sections"
+	genderButtonsContainer := SpBoxLayout newLeftToRight.
+	genders do: [ :gender | | button |
 		button := self newButton label: gender.
 		button action: [ 
 			self setInputsForCase: button label. 
-			Transcript show: 'button pressed: ', (((((grammarCase at: (button label)) at: 'wordlist') at: 1) at: 'word') capitalized); cr. ].
-		genderButtons add: button. ].
+		].
+		genderButtonsContainer add: button. ].
 ]
 
 { #category : #'scripting - widgets' }
@@ -157,23 +167,27 @@ DeclensionTabContentPresenter >> plural [
 { #category : #initialization }
 DeclensionTabContentPresenter >> setInputsForCase: aString [
 
-	Transcript show: 'setInputsForCase: called'; cr.
+	| rootWord |
+
+	
 	currentWord label: (((((grammarCase at: aString) at: 'wordlist') at: 1) at: 'word') capitalized).
+	rootWord := ((((grammarCase at: aString) at: 'wordlist') at: 1) at: 'rootword').
+	Transcript show: 'setInputsForCase: called', ', rootword: ', rootWord; cr.
 	
 	caseKeys do: [ :key | 
 		
-		(singularTextInputs at: key) whenSubmitDo: [ :text | | correctWord |
-			correctWord := ((((grammarCase at: aString) at: 'wordlist') at: 1) at: 'rootword'), (((grammarCase at: aString) at: 'singular') at: key).
-			Transcript show: correctWord; cr.
-			text = correctWord 
+		Transcript show: aString, ' updating ', key; cr.
+		
+		(singularTextInputs at: key) whenSubmitDo: [ :text | 
+			Transcript show: 'input: ', text, ' , against: ', (rootWord, (((grammarCase at: aString) at: 'singular') at: key)); cr.
+			text = (rootWord, (((grammarCase at: aString) at: 'singular') at: key)) 
 				ifTrue: [(singularFeedback at: key) image: inputCorrect  ] 
 				ifFalse: [(singularFeedback at: key) image: inputIncorrect ] 
 		].
 			
-		(pluralTextInputs at: key) whenSubmitDo: [ :text | | correctWord |
-			correctWord := ((((grammarCase at: aString) at: 'wordlist') at: 1) at: 'rootword'), (((grammarCase at: aString) at: 'plural') at: key).
-			Transcript show: correctWord; cr.
-			text = correctWord 
+		(pluralTextInputs at: key) whenSubmitDo: [ :text | 
+			Transcript show: 'input: ', text, ' , against: ', (rootWord, (((grammarCase at: aString) at: 'plural') at: key)); cr.
+			text = (rootWord, (((grammarCase at: aString) at: 'plural') at: key)) 
 				ifTrue: [(pluralFeedback at: key) image: inputCorrect ] 
 				ifFalse: [(pluralFeedback at: key) image: inputIncorrect ]
 		]
