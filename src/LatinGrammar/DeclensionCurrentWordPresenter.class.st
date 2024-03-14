@@ -46,6 +46,7 @@ DeclensionCurrentWordPresenter >> forWord: wordDictionary withCases: casesDictio
 	cases := casesDictionary.
 	gender := wordDictionary at: 'gender'.
 	word := wordDictionary at: 'latin'.
+	rootWord := wordDictionary at: 'stem'.
 ]
 
 { #category : #initialization }
@@ -54,10 +55,13 @@ DeclensionCurrentWordPresenter >> initializePresenters [
 	"Default layout needs to select the first gender for its particular case. "
 	| singularCaseSuffixes pluralCaseSuffixes |
 	
+	inputCorrect := self iconNamed: 'thumbsUp'.
+ 	inputIncorrect := self iconNamed: 'thumbsDown'.
+	
 	caseColumn := SpBoxLayout newTopToBottom
 		borderWidth: 10;
 		spacing: 10;
-		add: (SpLabelPresenter new label: word; displayBold: [true]).
+		add: (SpLabelPresenter new label: (word capitalized); displayBold: [true]).
 	#('Nominative' 'Genitive' 'Dative' 'Accusative' 'Ablative') do: [ :case | caseColumn add: case ].
 	
 	columnForSingularCaseInput := SpBoxLayout newTopToBottom
@@ -82,12 +86,12 @@ DeclensionCurrentWordPresenter >> initializePresenters [
 	pluralCaseSuffixes := (cases at: 'plural').
 		
 	#( 'nom' 'gen' 'dat' 'acc' 'abl' ) do: [ :key | | inflection feedBackPresenter |
-		inflection := rootWord , (singularCaseSuffixes at: key).
+		inflection := (rootWord , (singularCaseSuffixes at: key)).
 		feedBackPresenter := (SpImagePresenter new image: nil).
 		columnForSingularCaseInput add: (self textInputForCase: inflection feedBackPresenter: feedBackPresenter).
 		columnForSingularCaseFeedback add: feedBackPresenter.
 		
-		inflection := rootWord , (pluralCaseSuffixes at: key).
+		inflection := (rootWord , (pluralCaseSuffixes at: key)).
 		feedBackPresenter := (SpImagePresenter new image: nil).
 		columnForPluralCaseInput add: (self textInputForCase: inflection feedBackPresenter: feedBackPresenter).
 		columnForPluralCaseFeedback add: feedBackPresenter.
@@ -101,8 +105,9 @@ DeclensionCurrentWordPresenter >> initializePresenters [
 DeclensionCurrentWordPresenter >> textInputForCase: aString feedBackPresenter: aPicturePresenter [
 	
 	^ (self newTextInput) whenSubmitDo: [ :text | 
+			Transcript show: aString; cr.
 			text = aString 
 				ifTrue: [aPicturePresenter image: inputCorrect  ] 
-				ifFalse: [aPicturePresenter image: inputIncorrect ] 
-		].
+				ifFalse: [aPicturePresenter image: inputIncorrect ]
+		]
 ]
