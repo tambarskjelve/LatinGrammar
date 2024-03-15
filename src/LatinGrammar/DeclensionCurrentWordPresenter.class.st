@@ -49,6 +49,14 @@ DeclensionCurrentWordPresenter >> forWord: wordDictionary withCases: casesDictio
 	rootWord := wordDictionary at: 'stem'.
 ]
 
+{ #category : #'as yet unclassified' }
+DeclensionCurrentWordPresenter >> inflectionFrom: aStem and: aSuffix [
+	
+	aSuffix isEmpty 
+		ifTrue: [ ^ word ]
+		ifFalse: [ ^ (aStem, aSuffix) ]
+]
+
 { #category : #initialization }
 DeclensionCurrentWordPresenter >> initializePresenters [ 
 
@@ -86,12 +94,12 @@ DeclensionCurrentWordPresenter >> initializePresenters [
 	pluralCaseSuffixes := (cases at: 'plural').
 		
 	#( 'nom' 'gen' 'dat' 'acc' 'abl' ) do: [ :key | | inflection feedBackPresenter |
-		inflection := (rootWord , (singularCaseSuffixes at: key)).
+		inflection := self inflectionFrom:rootWord and: (singularCaseSuffixes at: key).
 		feedBackPresenter := (SpImagePresenter new image: nil).
 		columnForSingularCaseInput add: (self textInputForCase: inflection feedBackPresenter: feedBackPresenter).
 		columnForSingularCaseFeedback add: feedBackPresenter.
 		
-		inflection := (rootWord , (pluralCaseSuffixes at: key)).
+		inflection := self inflectionFrom:rootWord and: (pluralCaseSuffixes at: key).
 		feedBackPresenter := (SpImagePresenter new image: nil).
 		columnForPluralCaseInput add: (self textInputForCase: inflection feedBackPresenter: feedBackPresenter).
 		columnForPluralCaseFeedback add: feedBackPresenter.
@@ -105,13 +113,9 @@ DeclensionCurrentWordPresenter >> initializePresenters [
 DeclensionCurrentWordPresenter >> textInputForCase: aString feedBackPresenter: aPicturePresenter [
 	
 	^ (self newTextInput) whenSubmitDo: [ :text |
-			(aString isEmpty) 
-				ifTrue: [text = word 
-					ifTrue: [aPicturePresenter image: inputCorrect  ] 
-					ifFalse: [aPicturePresenter image: inputIncorrect ]] 
-				ifFalse: [ text = aString 
-					ifTrue: [aPicturePresenter image: inputCorrect  ] 
-					ifFalse: [aPicturePresenter image: inputIncorrect ]]. 
+			text = aString 
+				ifTrue: [aPicturePresenter image: inputCorrect  ] 
+				ifFalse: [aPicturePresenter image: inputIncorrect ].
 			Transcript show: aString; cr.	
-		]
+	]
 ]
