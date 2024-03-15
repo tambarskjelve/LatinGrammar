@@ -30,13 +30,18 @@ DeclensionCurrentWordPresenter class >> forWord: aString withCases: aDictionary 
 
 { #category : #layout }
 DeclensionCurrentWordPresenter >> defaultLayout [ 
-  			
+ 
+	| constraints |
+	
+	constraints := SpBoxConstraints new expand: false. 	
+	
 	^ SpBoxLayout newLeftToRight
-		add: caseColumn;
- 		add: columnForSingularCaseInput;
-		add: columnForSingularCaseFeedback;
- 		add: columnForPluralCaseInput;
-		add: columnForPluralCaseFeedback;
+		homogeneous: false;
+		add: caseColumn expand: false;
+ 		add: columnForSingularCaseInput expand: true;
+		add: columnForSingularCaseFeedback expand: false;
+ 		add: columnForPluralCaseInput expand: true;
+		add: columnForPluralCaseFeedback expand: false;
 		yourself.
 ]
 
@@ -83,11 +88,11 @@ DeclensionCurrentWordPresenter >> initializePresenters [
 		add: 'Plural'.
 	
 	columnForSingularCaseFeedback := SpBoxLayout newTopToBottom
-		add: (SpImagePresenter new image: nil);
+		add: (SpImagePresenter new image: ThemeIcons new blankIcon);
 		yourself.
 		
 	columnForPluralCaseFeedback := SpBoxLayout newTopToBottom
-		add: (SpImagePresenter new image: nil);
+		add: (SpImagePresenter new image: ThemeIcons new blankIcon);
 		yourself.
 		
 	singularCaseSuffixes := (cases at: 'singular').
