@@ -116,6 +116,5 @@ DeclensionCurrentWordPresenter >> textInputForCase: aString feedBackPresenter: a
 			text = aString 
 				ifTrue: [aPicturePresenter image: inputCorrect  ] 
 				ifFalse: [aPicturePresenter image: inputIncorrect ].
-			Transcript show: aString; cr.	
 	]
 ]
