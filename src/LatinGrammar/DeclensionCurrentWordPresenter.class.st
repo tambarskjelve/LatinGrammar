@@ -88,11 +88,11 @@ DeclensionCurrentWordPresenter >> initializePresenters [
 		add: 'Plural'.
 	
 	columnForSingularCaseFeedback := SpBoxLayout newTopToBottom
-		add: (SpImagePresenter new image: ThemeIcons new blankIcon);
+		add: (DeclensionImagePresenter new image: ThemeIcons new blankIcon);
 		yourself.
 		
 	columnForPluralCaseFeedback := SpBoxLayout newTopToBottom
-		add: (SpImagePresenter new image: ThemeIcons new blankIcon);
+		add: (DeclensionImagePresenter new image: ThemeIcons new blankIcon);
 		yourself.
 		
 	singularCaseSuffixes := (cases at: 'singular').
@@ -100,18 +100,15 @@ DeclensionCurrentWordPresenter >> initializePresenters [
 		
 	#( 'nom' 'gen' 'dat' 'acc' 'abl' ) do: [ :key | | inflection feedBackPresenter |
 		inflection := self inflectionFrom:rootWord and: (singularCaseSuffixes at: key).
-		feedBackPresenter := (SpImagePresenter new image: nil).
+		feedBackPresenter := (DeclensionImagePresenter new image: nil).
 		columnForSingularCaseInput add: (self textInputForCase: inflection feedBackPresenter: feedBackPresenter).
 		columnForSingularCaseFeedback add: feedBackPresenter.
 		
 		inflection := self inflectionFrom:rootWord and: (pluralCaseSuffixes at: key).
-		feedBackPresenter := (SpImagePresenter new image: nil).
+		feedBackPresenter := (DeclensionImagePresenter new image: nil).
 		columnForPluralCaseInput add: (self textInputForCase: inflection feedBackPresenter: feedBackPresenter).
 		columnForPluralCaseFeedback add: feedBackPresenter.
 	].
-		
-	
-
 ]
 
 { #category : #'as yet unclassified' }
