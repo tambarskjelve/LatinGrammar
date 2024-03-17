@@ -114,9 +114,20 @@ DeclensionCurrentWordPresenter >> initializePresenters [
 { #category : #'as yet unclassified' }
 DeclensionCurrentWordPresenter >> textInputForCase: aString feedBackPresenter: aPicturePresenter [
 	
-	^ (self newTextInput) whenSubmitDo: [ :text |
+	| textInput inputEventHandler |
+	
+	textInput := self newTextInput.
+	
+	textInput whenSubmitDo: [ :text |
 			text = aString 
 				ifTrue: [aPicturePresenter image: inputCorrect  ] 
-				ifFalse: [aPicturePresenter image: inputIncorrect ].
-	]
+				ifFalse: [aPicturePresenter image: inputIncorrect ] 
+	].		
+	(textInput eventHandler) whenFocusLostDo: [ 
+			(textInput text) = aString 
+				ifTrue: [aPicturePresenter image: inputCorrect  ] 
+				ifFalse: [aPicturePresenter image: inputIncorrect ]
+	].
+			
+	^ textInput.
 ]
